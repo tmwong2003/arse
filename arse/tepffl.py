@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 '''
 Created on Sep 10, 2017
 
@@ -7,7 +6,6 @@ Created on Sep 10, 2017
 
 from __future__ import print_function
 
-import argparse
 import json
 import logging
 import pandas as pd
@@ -30,27 +28,39 @@ def _deserialize_roster_json(roster_json):
         raise RuntimeError('Failed to find \'rows\' in the player table: Invalid roster JSON or new format?')
     if 'cols' not in players_table.keys():
         raise RuntimeError('Failed to find \'cols\' in the player table: Invalid roster JSON or new format?')
-    players_table_rows = [[field['v'] for field in p['c']] for p in players_table['rows']]
+    players_table_rows = [[field['v'] for field in pos['c']] for pos in players_table['rows']]
     players_table_cols = [c['id'] for c in players_table['cols']]
     return pd.DataFrame(data=players_table_rows, columns=players_table_cols)
 
 
 class Team(object):
 
+    PLAYER_NAME = 'FullName'
+    PLAYER_POSITION = 'PosShortName'
+
     TEPFFL_TEAM_IDS = range(1517, 1529)
-    TEPFFL_POSITIONS = ['QB', 'RB', 'WR', 'OL', 'DST', 'K']
     TEPFFL_ROSTER_SIZE_MAX = 19
 
-    _ROSTER_URL_TEMPLATE = ''
+    _ROSTER_URL = None
+    _ROSTER_QUERY_TEMPLATE = '{}?rnd={}&seasonId={}&weekNumber={}&teamId={}'
+    _ROSTER_SEASON = None
+    _ROSTER_COLUMNS = [PLAYER_NAME, 'NflAbbreviation', PLAYER_POSITION]
 
-    _ROSTER_COLUMNS = ['FullName', 'NflAbbreviation', 'PosShortName']
+    @classmethod
+    def configure(cls, config):
+        cls._ROSTER_URL = config.get('tepffl', 'url')
+        cls._ROSTER_SEASON = config.get('tepffl', 'season')
 
-    def __init__(self, team_id, filename=None):
+    def __init__(self, team_id, week, filename=None):
+        if self._ROSTER_URL is None:
+            raise RuntimeError('Failed to set TEP FFL roster URL')
+        if self._ROSTER_SEASON is None:
+            raise RuntimeError('Failed to set TEP FFL season ID')
         self.team_id = team_id
-
         roster_json = None
         if filename is None:
-            roster_url = self._ROSTER_URL_TEMPLATE.format(int(random.uniform(0, 65536)), self.team_id)
+            roster_url = self._ROSTER_QUERY_TEMPLATE.format(self._ROSTER_URL, int(random.uniform(0, 65536)), self._ROSTER_SEASON, week, self.team_id)
+            _logger.debug('Getting roster from {}'.format(roster_url))
             response = requests.get(roster_url)
             if response.status_code == 200:
                 roster_json = response.text
@@ -73,36 +83,32 @@ class Team(object):
         return self.df[['FullName', 'NflAbbreviation', 'PosShortName']]
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
+def get_team_args(parser):
+    team_parser = parser.add_argument_group('Team options')
+    team_parser.add_argument(
         '--team-id',
         nargs='*',
-        default=Team.TEPFFL_TEAM_IDS,
         type=int,
         choices=Team.TEPFFL_TEAM_IDS,
         help='Zero or more team IDs for which to retrieve rosters (default is to retrieve all rosters)',
     )
-    parser.add_argument(
-        '--position',
-        '-p',
-        default=None,
-        choices=Team.TEPFFL_POSITIONS,
-        help='Show only players in the named position (default is to show all)',
+    team_parser.add_argument(
+        'week',
+        type=int,
+        help='The season week'
     )
-    parser.add_argument(
-        '--debug-level',
-        default=logging.INFO,
-        help='The debug level (default {})'.format(logging.getLevelName(logging.INFO)),
-    )
-    args = parser.parse_args()
 
-    logging.basicConfig(level=args.debug_level)
 
-    for team_id in args.team_id:
-        _logger.info('Gathering roster for team {}'.format(team_id))
-        r = Team(team_id)
-        if args.position is not None:
-            print(r.roster[r.df.PosShortName == args.position])
-        else:
-            print(r.roster)
+def get_rosters(week, team_ids=None):
+    if team_ids is None:
+        team_ids = Team.TEPFFL_TEAM_IDS
+    teams = []
+    for team_id in team_ids:
+        _logger.debug('Gathering roster for team {}'.format(team_id))
+        team = Team(team_id, week)
+        if len(team.roster) < Team.TEPFFL_ROSTER_SIZE_MAX:
+            _logger.warning('TEP FFL team with ID {} has a short roster: Expected {}, got {}'.format(team_id, Team.TEPFFL_ROSTER_SIZE_MAX, len(team.roster)))
+        if len(team.roster) > Team.TEPFFL_ROSTER_SIZE_MAX:
+            _logger.error('TEP FFL team with ID {} has an oversize roster: Expected {}, got {}'.format(team_id, Team.TEPFFL_ROSTER_SIZE_MAX, len(team.roster)))
+        teams.append(team)
+    return pd.concat([t.roster for t in teams], ignore_index=True)
