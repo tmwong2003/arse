@@ -25,7 +25,7 @@ if __name__ == '__main__':
 
     logging.basicConfig(level=args.debug_level)
 
-    config.read(args.config)
+    config.read(args.config_path)
 
     # Step 1: Gather all of the TEP FFL active rosters
     arse.Team.configure(config)
