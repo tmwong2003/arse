@@ -4,7 +4,7 @@ import espn
 import fantasypros
 import logging
 
-from tepffl import Team, get_team_args, get_rosters
+from tepffl import Team, get_rosters, get_team_args, load_rosters
 
 PLAYER_POSITIONS = ['QB', 'RB', 'WR', 'TE', 'OL', 'DST', 'K']
 
@@ -17,8 +17,13 @@ def add_general_args(parser):
         help='Show this help message',
     )
     common_parser.add_argument(
+        '--file',
+        default=None,
+        type=str,
+        help='File from which to load league rosters (default is to load from the league server)',
+    )
+    common_parser.add_argument(
         '--position',
-        '-p',
         nargs='*',
         choices=PLAYER_POSITIONS,
         help='Select only players for the named position (default is to select all)',
