@@ -9,6 +9,7 @@ from __future__ import print_function
 
 import arse
 import argparse
+import json
 import logging
 
 from ConfigParser import SafeConfigParser
@@ -19,7 +20,7 @@ if __name__ == '__main__':
     config = SafeConfigParser()
 
     parser = argparse.ArgumentParser(add_help=False)
-    arse.get_team_args(parser)
+    arse.get_team_args(parser, include_team_ids=False)
     arse.add_general_args(parser)
     args = parser.parse_args()
 
@@ -29,17 +30,25 @@ if __name__ == '__main__':
 
     # Step 1: Gather all of the TEP FFL active rosters
     arse.Team.configure(config)
-    rosters = arse.get_rosters(args.week)
+    if args.file is not None:
+        rosters = arse.load_rosters(args.file)
+    else:
+        rosters = arse.get_rosters(args.week)
 
     # Step 2: Get rankings
 
     rankings = arse.get_rankings(args.position)
 
     # Step 3: Generate the free-agent rankings
+    remap = json.loads(config.get('map', 'map'))
+    def fix(name):  # @IgnorePep8
+        if name in remap:
+            name = str(remap[name])
+        return filter(str.isalnum, name).lower()
     print("Week {} free agents".format(args.week))
     positions = args.position if args.position is not None else arse.PLAYER_POSITIONS
     for position in positions:
-        taken = rosters[rosters[arse.Team.PLAYER_POSITION] == position][arse.Team.PLAYER_NAME].tolist()
+        taken = [fix(t) for t in rosters[rosters[arse.Team.PLAYER_POSITION] == position][arse.Team.PLAYER_NAME].tolist()]
         print('{} free agents ({} taken, {} ranked)'.format(position, len(taken), len(rankings[position])))
-        for player in [p for p in rankings[position] if p[1] not in taken]:
+        for player in [p for p in rankings[position] if fix(p[1]) not in taken]:
             print('{}\t{} {}'.format(player[0], player[1], player[2]))

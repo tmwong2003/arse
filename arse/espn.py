@@ -24,7 +24,7 @@ class Ranking(object):
         'Buffalo': 'Buffalo Bills',
         'Carolina': 'Carolina Panthers',
         'Chicago': 'Chicago Bears',
-        'Cincinnati': 'Cincinnati Falcons',
+        'Cincinnati': 'Cincinnati Bengals',
         'Cleveland': 'Cleveland Browns',
         'Dallas': 'Dallas Cowboys',
         'Denver': 'Denver Broncos',

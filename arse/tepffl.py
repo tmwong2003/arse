@@ -8,6 +8,7 @@ from __future__ import print_function
 
 import json
 import logging
+import os
 import pandas as pd
 import random
 import requests
@@ -83,15 +84,16 @@ class Team(object):
         return self.df[['FullName', 'NflAbbreviation', 'PosShortName']]
 
 
-def get_team_args(parser):
+def get_team_args(parser, include_team_ids=True):
     team_parser = parser.add_argument_group('Team options')
-    team_parser.add_argument(
-        '--team-id',
-        nargs='*',
-        type=int,
-        choices=Team.TEPFFL_TEAM_IDS,
-        help='Zero or more team IDs for which to retrieve rosters (default is to retrieve all rosters)',
-    )
+    if include_team_ids:
+        team_parser.add_argument(
+            '--team-id',
+            nargs='*',
+            type=int,
+            choices=Team.TEPFFL_TEAM_IDS,
+            help='Zero or more team IDs for which to retrieve rosters (default is to retrieve all rosters)',
+        )
     team_parser.add_argument(
         'week',
         type=int,
@@ -112,3 +114,9 @@ def get_rosters(week, team_ids=None):
             _logger.error('TEP FFL team with ID {} has an oversize roster: Expected {}, got {}'.format(team_id, Team.TEPFFL_ROSTER_SIZE_MAX, len(team.roster)))
         teams.append(team)
     return pd.concat([t.roster for t in teams], ignore_index=True)
+
+
+def load_rosters(filename):
+    if not os.path.exists(filename):
+        raise RuntimeError('Failed to find roster file {}'.format(filename))
+    return pd.read_csv(filename)
