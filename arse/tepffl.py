@@ -84,20 +84,14 @@ class Team(object):
         return self.df[['FullName', 'NflAbbreviation', 'PosShortName']]
 
 
-def get_team_args(parser, include_team_ids=True):
+def get_tepffl_args(parser, include_team_ids=True):
     team_parser = parser.add_argument_group('Team options')
-    if include_team_ids:
-        team_parser.add_argument(
-            '--team-id',
-            nargs='*',
-            type=int,
-            choices=Team.TEPFFL_TEAM_IDS,
-            help='Zero or more team IDs for which to retrieve rosters (default is to retrieve all rosters)',
-        )
     team_parser.add_argument(
-        'week',
+        '--team-id',
+        nargs='*',
         type=int,
-        help='The season week'
+        choices=Team.TEPFFL_TEAM_IDS,
+        help='Zero or more team IDs for which to retrieve rosters (default is to retrieve all rosters)',
     )
 
 
@@ -116,7 +110,5 @@ def get_rosters(week, team_ids=None):
     return pd.concat([t.roster for t in teams], ignore_index=True)
 
 
-def load_rosters(filename):
-    if not os.path.exists(filename):
-        raise RuntimeError('Failed to find roster file {}'.format(filename))
-    return pd.read_csv(filename)
+def load_rosters(file):
+    return pd.read_csv(file)
