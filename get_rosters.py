@@ -20,7 +20,7 @@ if __name__ == '__main__':
     config = SafeConfigParser()
 
     parser = argparse.ArgumentParser(add_help=False)
-    arse.get_team_args(parser)
+    arse.get_tepffl_args(parser)
     arse.add_general_args(parser)
     parser.add_argument(
         '--to-file',

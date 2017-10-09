@@ -20,7 +20,6 @@ if __name__ == '__main__':
     config = SafeConfigParser()
 
     parser = argparse.ArgumentParser(add_help=False)
-    arse.get_team_args(parser, include_team_ids=False)
     arse.add_general_args(parser)
     args = parser.parse_args()
 

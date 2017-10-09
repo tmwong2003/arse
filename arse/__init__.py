@@ -1,10 +1,11 @@
 from __future__ import print_function
 
+import argparse
 import espn
 import fantasypros
 import logging
 
-from tepffl import Team, get_rosters, get_team_args, load_rosters
+from tepffl import Team, get_rosters, get_tepffl_args, load_rosters
 
 PLAYER_POSITIONS = ['QB', 'RB', 'WR', 'TE', 'OL', 'DST', 'K']
 
@@ -15,12 +16,6 @@ def add_general_args(parser):
         '--help', '-h',
         action='help',
         help='Show this help message',
-    )
-    common_parser.add_argument(
-        '--file',
-        default=None,
-        type=str,
-        help='File from which to load league rosters (default is to load from the league server)',
     )
     common_parser.add_argument(
         '--position',
@@ -37,6 +32,17 @@ def add_general_args(parser):
         '--debug-level',
         default=logging.INFO,
         help='The debug level (default {})'.format(logging.getLevelName(logging.INFO)),
+    )
+    roster_parser = common_parser.add_mutually_exclusive_group(required=True)
+    roster_parser.add_argument(
+        '--file',
+        type=argparse.FileType('r', 0),
+        help='File from which to load league rosters (default is to load from the league server)',
+    )
+    roster_parser.add_argument(
+        '--week',
+        type=int,
+        help='The season week'
     )
 
 
