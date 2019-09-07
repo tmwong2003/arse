@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.python.org/pypi"
+verify_ssl = true
+name = "PyPI"
+
+[packages]
+configparser = "*"
+lxml = "*"
+pandas = "*"
+requests = "*"
+
+[dev-packages]
+black = "==19.3b0"
+ipython = "*"
+
+[requires]
+python_version = "3.6"
