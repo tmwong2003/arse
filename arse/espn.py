@@ -4,18 +4,16 @@ Created on Sep 11, 2017
 @author: twong
 '''
 
-from __future__ import print_function
-
 import logging
-import requests
 
+import requests
 from lxml import html
 
 _logger = logging.getLogger(__name__)
 
 
 class Ranking(object):
-    _URL = 'http://www.espn.com/nfl/statistics/team/_/stat/total'
+    _URL = 'https://www.espn.com/nfl/stats/team/_/season/2018/seasontype/2'
 
     _TEAM_NAME_MAP = {
         'Arizona': 'Arizona Cardinals',
@@ -61,12 +59,14 @@ class Ranking(object):
         if response.status_code == 200:
             self._xpath_tree = html.fromstring(response.content)
         else:
-            raise RuntimeError('Failed to get rankings from server: Got response code {}'.format(response.status_code))
+            raise RuntimeError(f'Failed to get rankings from server: Got response code {response.status_code}')
         self._players = []
         rank = 1
-        for player in self.xpath_tree.xpath('//div[@class="mod-content"]/table/tr[@class!="colhead"]/td/a'):
-            self._players.append((rank, self._TEAM_NAME_MAP[player.text], ''))
-            rank += 1
+        for rank in range(1, 33):
+            player = self.xpath_tree.xpath(
+                f'//*[@id="fittPageContainer"]/div[3]/div[1]/div/article/div/section/table/tbody/tr/td[1]/div/table/tbody/tr[{rank}]'
+            )[0].text_content()
+            self._players.append((rank, player, ''))
 
     @property
     def position(self):

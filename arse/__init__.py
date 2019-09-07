@@ -1,33 +1,23 @@
-from __future__ import print_function
-
 import argparse
-import espn
-import fantasypros
 import logging
 
-from tepffl import Team, get_rosters, get_tepffl_args, load_rosters
+from . import espn
+from . import fantasypros
+from .tepffl import Team, get_rosters, get_tepffl_args, load_rosters
 
 PLAYER_POSITIONS = ['QB', 'RB', 'WR', 'TE', 'OL', 'DST', 'K']
 
 
 def add_general_args(parser):
     common_parser = parser.add_argument_group('General options')
-    common_parser.add_argument(
-        '--help', '-h',
-        action='help',
-        help='Show this help message',
-    )
+    common_parser.add_argument('--help', '-h', action='help', help='Show this help message')
     common_parser.add_argument(
         '--position',
         nargs='*',
         choices=PLAYER_POSITIONS,
         help='Select only players for the named position (default is to select all)',
     )
-    common_parser.add_argument(
-        '--config-path',
-        default='config.ini',
-        help='The path to the configuration file',
-    )
+    common_parser.add_argument('--config-path', default='config.ini', help='The path to the configuration file')
     common_parser.add_argument(
         '--debug-level',
         default=logging.INFO,
@@ -39,11 +29,7 @@ def add_general_args(parser):
         type=argparse.FileType('r', 0),
         help='File from which to load league rosters (default is to load from the league server)',
     )
-    roster_parser.add_argument(
-        '--week',
-        type=int,
-        help='The season week'
-    )
+    roster_parser.add_argument('--week', type=int, help='The season week')
 
 
 def get_rankings(positions=None):
@@ -52,7 +38,7 @@ def get_rankings(positions=None):
     rankings = {}
     for position in positions:
         if position not in PLAYER_POSITIONS:
-            raise ValueError('Got an invalid position: Expected {}, got {}'.format(PLAYER_POSITIONS, position))
+            raise ValueError(f'Got an invalid position: Expected {PLAYER_POSITIONS}, got {position}')
         if position == 'OL':
             rankings[position] = espn.Ranking(position)
         else:

@@ -5,11 +5,10 @@ Created on Sep 11, 2017
 @author: twong
 '''
 
-from __future__ import print_function
-
 import argparse
-import arse
 import logging
+
+import arse
 
 _logger = logging.getLogger(__name__)
 
