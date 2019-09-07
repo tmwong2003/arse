@@ -4,11 +4,9 @@ Created on Sep 11, 2017
 @author: twong
 '''
 
-from __future__ import print_function
-
 import logging
-import requests
 
+import requests
 from lxml import html
 
 _logger = logging.getLogger(__name__)
@@ -25,7 +23,9 @@ class Ranking(object):
         if response.status_code == 200:
             self._xpath_tree = html.fromstring(response.content)
         else:
-            raise RuntimeError('Failed to get rankings from server: Got response code {}: Possibly bad position {}?'.format(response.status_code, position))
+            raise RuntimeError(
+                f'Failed to get rankings from server: Got response code {response.status_code}: Possibly bad position {position}?'
+            )
         self._players = []
         rank = 1
         for player in self.xpath_tree.xpath('//div[@class="player-select"]'):

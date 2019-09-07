@@ -5,13 +5,11 @@ Created on Sep 11, 2017
 @author: twong
 '''
 
-from __future__ import print_function
-
 import argparse
-import arse
 import logging
+from configparser import SafeConfigParser
 
-from ConfigParser import SafeConfigParser
+import arse
 
 _logger = logging.getLogger(__name__)
 
@@ -23,10 +21,7 @@ if __name__ == '__main__':
     arse.get_tepffl_args(parser)
     arse.add_general_args(parser)
     parser.add_argument(
-        '--to-file',
-        type=str,
-        default=None,
-        help='File to which to save rosters (default is to dump to stdout)',
+        '--to-file', type=str, default=None, help='File to which to save rosters (default is to dump to stdout)'
     )
     args = parser.parse_args()
 
@@ -37,7 +32,7 @@ if __name__ == '__main__':
     arse.Team.configure(config)
     rosters = arse.get_rosters(args.week, team_ids=args.team_id)
     if args.to_file is not None:
-        print("Saving to file {}...".format(args.to_file))
+        print('Saving to file {}...'.format(args.to_file))
         rosters.to_csv(args.to_file, index=False)
     else:
         print(rosters)
