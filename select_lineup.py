@@ -43,7 +43,7 @@ if __name__ == '__main__':
     def fix(name):  # @IgnorePep8
         if name in remap:
             name = str(remap[name])
-        return filter(str.isalnum, name).lower()
+        return ''.join(filter(str.isalnum, name)).lower()
 
     print('Week {} free agents'.format(args.week))
     positions = args.position if args.position is not None else arse.PLAYER_POSITIONS
