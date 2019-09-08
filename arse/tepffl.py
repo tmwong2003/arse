@@ -37,7 +37,7 @@ class Team(object):
     PLAYER_NAME = 'FullName'
     PLAYER_POSITION = 'PosShortName'
 
-    TEPFFL_TEAM_IDS = range(1517, 1529)
+    TEPFFL_TEAM_IDS = range(1611, 1623)
     TEPFFL_ROSTER_SIZE_MAX = 19
 
     _ROSTER_URL = None

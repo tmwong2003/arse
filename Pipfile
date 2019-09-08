@@ -11,6 +11,7 @@ requests = "*"
 
 [dev-packages]
 black = "==19.3b0"
+ipython = "*"
 
 [requires]
 python_version = "3.6"
