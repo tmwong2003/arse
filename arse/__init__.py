@@ -3,7 +3,7 @@ import logging
 
 from . import espn
 from . import fantasypros
-from .tepffl import Team, get_rosters, get_tepffl_args, load_rosters
+from .tepffl import Team, get_rosters, add_tepffl_args, load_rosters
 
 PLAYER_POSITIONS = ['QB', 'RB', 'WR', 'TE', 'OL', 'DST', 'K']
 

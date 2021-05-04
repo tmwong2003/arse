@@ -86,7 +86,7 @@ class Team(object):
         return self.df[['FullName', 'NflAbbreviation', 'PosShortName']]
 
 
-def get_tepffl_args(parser):
+def add_tepffl_args(parser):
     team_parser = parser.add_argument_group('Team options')
     team_parser.add_argument(
         '--team-id',
@@ -97,7 +97,7 @@ def get_tepffl_args(parser):
     )
 
 
-def get_rosters(week, team_ids=None):
+def get_rosters(week, team_ids=None, position=None):
     if team_ids is None:
         team_ids = Team.TEPFFL_TEAM_IDS
     teams = []
@@ -113,7 +113,10 @@ def get_rosters(week, team_ids=None):
                 f'TEP FFL team with ID {team_id} has an oversize roster: Expected {Team.TEPFFL_ROSTER_SIZE_MAX}, got {len(team.roster)}'
             )
         teams.append(team)
-    return pd.concat([t.roster for t in teams], ignore_index=True)
+    df = pd.concat([t.roster for t in teams], ignore_index=True)
+    if position:
+        df = df[df['PosShortName'].str.match('|'.join(position))]
+    return df
 
 
 def load_rosters(file):

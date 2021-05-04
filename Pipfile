@@ -1,5 +1,5 @@
 [[source]]
-url = "https://pypi.python.org/pypi"
+url = "https://pypi.org/simple"
 verify_ssl = true
 name = "PyPI"
 
@@ -10,8 +10,5 @@ pandas = "*"
 requests = "*"
 
 [dev-packages]
-black = "==19.3b0"
+black   = "==21.4b2" # Locked for pre-release version
 ipython = "*"
-
-[requires]
-python_version = "3.6"

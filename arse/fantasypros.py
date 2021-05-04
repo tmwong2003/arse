@@ -10,10 +10,12 @@ import requests
 from lxml import html
 
 _logger = logging.getLogger(__name__)
+_logger.setLevel(logging.DEBUG)
 
 
 class Ranking(object):
     _FANTASYPROS_URL_TEMPLATE = 'https://www.fantasypros.com/nfl/start/{}.php'
+    _FANTASYPROS_XPATH = '//div[@class="player-select"]'
 
     def __init__(self, position):
         self._position = position
@@ -28,7 +30,7 @@ class Ranking(object):
             )
         self._players = []
         rank = 1
-        for player in self.xpath_tree.xpath('//div[@class="player-select"]'):
+        for player in self.xpath_tree.xpath(self._FANTASYPROS_XPATH):
             name = player.xpath('a/@title')[0]
             team = player.xpath('*[@class="player-team"]/text()')
             _logger.debug('Processing player {}'.format(name))
